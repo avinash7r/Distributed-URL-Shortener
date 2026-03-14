@@ -2,3 +2,5 @@
 */terraform*
 temp/
 pre-req/*
+*/.env
+*/monitor
