@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-url-shortner
+spec:
+  selector:
+    matchLabels:
+      app: server-url-shortner
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: server-url-shortner
+    spec:
+      containers:
+      - name: server-url-shortner
+        image: server-image
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        envFrom:
+        - secretRef:
+            name: server-secrets
+        ports:
+        - containerPort: 3000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-shortner-service
+spec:
+  selector:
+    app: server-url-shortner
+  ports:
+  - port: 3000
+    targetPort: 3000
+
