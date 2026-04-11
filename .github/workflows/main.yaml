@@ -1,0 +1,42 @@
+name: url-shortner
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      client: ${{ steps.changes.outputs.client_any_changed }}
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: detect changes
+        id: changes
+        uses: tj-actions/changed-files@v46.0.1
+        with:
+          files_yaml: |
+            client:
+              - 'client/**'
+
+  build-push-client:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.client == 'true'
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: build and push client image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./client
+          file: ./client/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener-client:${{ github.sha }}

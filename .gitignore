@@ -3,4 +3,9 @@
 temp/
 pre-req/*
 */.env
-*/monitor
+*monitor
+
+/server
+/pre-req
+/k6
+/temp

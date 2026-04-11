@@ -1,7 +1,7 @@
 services:
-  url-shortener:
+  server:
     build:
-      context: ./server-js
+      context: ./server
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
@@ -10,8 +10,22 @@ services:
       - redis
     environment:
       - PORT=3000
-      - DB_URL=postgres://avi:avi@postgres:5432/url_shortener?sslmode=disable
+      # - DB_URL=postgres://avi:avi@postgres:5432/url_shortener?sslmode=disable
       - REDIS_URL=redis://redis:6379
+      - DB_HOST=postgres
+      - DB_USER=avi
+      - DB_PASSWORD=avi
+      - DB_PORT=5432
+      - DB_NAME=url_shortener
+
+  
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+  
   postgres:
     image: postgres:16
     container_name: postgres
@@ -23,6 +37,12 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg-isready", "-U avi"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   redis:
     image: redis:latest
