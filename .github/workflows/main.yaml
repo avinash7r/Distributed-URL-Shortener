@@ -41,7 +41,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build image
-        run: docker build -t url-shortner-client ./client
+        run: docker build -t url-shortner-client:${GITHUB_SHA} ./client
       - name: Tag image
         run: docker tag url-shortner-client:${GITHUB_SHA} ${{secrets.ECR_REPOSITORY_URI}}:${{github.sha}}
       - name: Push image to ECR
